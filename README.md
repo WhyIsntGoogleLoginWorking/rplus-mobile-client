@@ -63,5 +63,6 @@ No. But I am working on it!
 [Discord](https://discord.gg/g2KTP5X9At)
 ## Developers
 Splamei - Client Developer
+
 henryzt - Rhythm Plus Developer
 ## Built with ❤️ in Android Studio
