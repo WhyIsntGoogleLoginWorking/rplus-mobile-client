@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Error checking for updates!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -263,13 +263,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 catch (Exception e){
-                    Toast.makeText(MainActivity.this, "Error getting notices!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Error decoding notices!", Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Error getting notices!", Toast.LENGTH_SHORT).show();
             }
         });
 
