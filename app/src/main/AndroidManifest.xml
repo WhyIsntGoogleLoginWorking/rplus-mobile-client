@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RhythmPlusSplameiClient"
         android:usesCleartextTraffic="true"
+        android:configChanges="orientation|screenSize|keyboardHidden"
         tools:targetApi="31" >
         <activity
             android:name=".MainActivity"
