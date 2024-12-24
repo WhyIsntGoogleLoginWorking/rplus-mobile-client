@@ -16,11 +16,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RhythmPlusSplameiClient"
         android:usesCleartextTraffic="true"
-        android:configChanges="orientation|screenSize|keyboardHidden"
         tools:targetApi="31" >
         <activity
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:name=".MainActivity"
-            android:exported="true" >
+            android:exported="true"
+            android:screenOrientation="unspecified"
+            android:windowSoftInputMode="stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
