@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                     // load my page
                     return false;
                 }
-                else if (url.contains(urlForNewTab)){
+                else if (url.contains(urlForNewTab)) {
                     hasShownAuth = false;
 
                     webView.setVisibility(View.GONE);
@@ -193,12 +193,11 @@ public class MainActivity extends AppCompatActivity
 
                     return true;
                 }
-                return false;
 
-                //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                //view.getContext().startActivity(intent);
-                //return true;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                view.getContext().startActivity(intent);
+                return true;
             }
 
             @Override
