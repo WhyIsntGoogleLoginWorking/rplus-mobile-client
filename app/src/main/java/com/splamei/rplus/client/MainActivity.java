@@ -16,6 +16,7 @@ import android.webkit.WebViewClient;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -25,6 +26,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.graphics.drawable.IconCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import android.content.DialogInterface;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.webkit.WebSettings;
 import android.widget.ImageView;
@@ -38,6 +43,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -75,8 +84,6 @@ public class MainActivity extends AppCompatActivity
 
     boolean hasShownAuth = false;
 
-    public static final String UPDATE_CHANNEL_ID = "update_channel";
-    public static final String NOTICES_CHANNEL_ID = "notices_channel";
     public static final String CHANNEL_ID = "testing_channel";
     public static final String MISC_CHANNEL_ID = "misc_channel";
 
@@ -93,8 +100,6 @@ public class MainActivity extends AppCompatActivity
             return insets;
         });
 
-        createChannel(this, UPDATE_CHANNEL_ID, "Update Directs", "Notifications that alert you upon a new update", NotificationManager.IMPORTANCE_HIGH);
-        createChannel(this, NOTICES_CHANNEL_ID, "Notice Information", "Notices for the client", NotificationManager.IMPORTANCE_HIGH);
         createChannel(this, CHANNEL_ID, "Testing Channel", "The notification channel for testing during development. Unused in release builds", NotificationManager.IMPORTANCE_DEFAULT);
         createChannel(this, MISC_CHANNEL_ID, "Misc", "Other notifcations used by the client", NotificationManager.IMPORTANCE_DEFAULT);
 
@@ -219,19 +224,24 @@ public class MainActivity extends AppCompatActivity
         webView.setWebViewClient(webViewClient);
         webView.loadUrl(urlToLoad);
 
+        //CoordinatorLayout coordinatorLayout = findViewById(R.id.main);
+        //Snackbar snackbar = Snackbar.make(coordinatorLayout,
+        //        "Failed to check for updates", Snackbar.LENGTH_LONG);
+        //snackbar.show();
+
         if (!offlineMode) {
             String url = updateUrl;
             StringRequest ExampleStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     if (fileExists(MainActivity.this, "checkCode.dat")) {
-                        if (!readFile(MainActivity.this, "checkCode.dat").strip().equals(response)) {
-                            saveToFile(MainActivity.this, "checkCode.dat", response);
+                        if (!readFile(MainActivity.this, "checkCode.dat").strip().equals(response.strip())) {
+                            saveToFile(MainActivity.this, "checkCode.dat", response.strip());
                             newUpdate(MainActivity.this, response.strip());
                         }
                     } else {
                         saveToFile(MainActivity.this, "checkCode.dat", response);
-                        newUpdate(MainActivity.this, response.strip());
+                        newUpdate(MainActivity.this, response);
                     }
                 }
             }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
@@ -257,12 +267,14 @@ public class MainActivity extends AppCompatActivity
 
                         if (!seenNotices.contains(splitNotices[3]) && !splitNotices[0].equals("NONE")) {
                             Toast.makeText(MainActivity.this, "There's a new notice. Check the notification we sent you if enabled.", Toast.LENGTH_SHORT).show();
-                            saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
-                            if (!Objects.equals(splitNotices[2], "NONE")) {
-                                sendNotificationWithURL(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT, splitNotices[2], "More Info");
-                            } else {
-                                sendNotifcation(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT);
-                            }
+                            //saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
+                            showNewNotice(MainActivity.this, splitNotices[0], splitNotices[1], splitNotices[2]);
+
+                            //if (!Objects.equals(splitNotices[2], "NONE")) {
+                            //    sendNotificationWithURL(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT, splitNotices[2], "More Info");
+                            //} else {
+                            //    sendNotifcation(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT);
+                            //}
                         }
                     } catch (Exception e) {
                         Toast.makeText(MainActivity.this, "Error decoding notices", Toast.LENGTH_SHORT).show();
@@ -366,6 +378,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static void showDialogBox(Context context, String title, String text, String button1Text, String button2text, DialogInterface.OnClickListener button1Pressed, DialogInterface.OnClickListener button2Pressed)
+    {
+        if (button2text.isEmpty())
+        {
+            new MaterialAlertDialogBuilder(context)
+                    .setTitle(title)
+                    .setMessage(text)
+                    .setPositiveButton(button1Text, button1Pressed)
+                    .show();
+        }
+        else
+        {
+            new MaterialAlertDialogBuilder(context)
+                    .setTitle(title)
+                    .setMessage(text)
+                    .setPositiveButton(button1Text, button1Pressed)
+                    .setNegativeButton(button2text, button2Pressed)
+                    .show();
+        }
+    }
+
     public static String readFile(Context context, String fileName) {
         File file = new File(context.getFilesDir(), fileName);
         StringBuilder text = new StringBuilder();
@@ -397,9 +430,38 @@ public class MainActivity extends AppCompatActivity
 
     public static void newUpdate(Context context, String responce){
         if (!myVerCode.contains(responce)) {
-            sendNotificationWithURL(context, UPDATE_CHANNEL_ID, "New Update", "The is a new update to the client. Tap or press the button to update. You won't be alerted about this update again.", NotificationCompat.PRIORITY_DEFAULT, "https://www.veemo.uk/r-plus-download", "Update");
-            Toast.makeText(context, "Theres a new update to the client", Toast.LENGTH_LONG).show();
-            Toast.makeText(context, "Check the GitHub Repo to update the client", Toast.LENGTH_LONG).show();
+            //sendNotificationWithURL(context, UPDATE_CHANNEL_ID, "New Update", "The is a new update to the client. Tap or press the button to update. You won't be alerted about this update again.", NotificationCompat.PRIORITY_DEFAULT, "https://www.veemo.uk/r-plus-download", "Update");
+            //Toast.makeText(context, "Theres a new update to the client", Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "Check the GitHub Repo to update the client", Toast.LENGTH_LONG).show();
+
+            showDialogBox(context, "New update", "There is a new update to the client app. It's recommended you update for the latest fixes and changes however you can optionally skip though it's not recommended.\n\nWe won't tell you about this until the next update", "Update", "Later", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(context, "GitHub should now open via the app or website", Toast.LENGTH_SHORT).show();
+                    context.startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/splamei/rplus-mobile-client/releases/")));
+                    System.exit(0);
+                }
+            }, null);
+        }
+    }
+
+    public static void showNewNotice(Context context, String title, String text, String url)
+    {
+        if (url.contains("NONE"))
+        {
+            showDialogBox(context, title, text, "Ok", url, null, null);
+        }
+        else
+        {
+            showDialogBox(context, title, text, "Ok", "More", null, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(context, "You are now being directed to the url provided", Toast.LENGTH_SHORT).show();
+                    context.startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(url)));
+                }
+            });
         }
     }
 }
