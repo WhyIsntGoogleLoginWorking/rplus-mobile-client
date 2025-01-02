@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -73,10 +75,14 @@ public class MainActivity extends AppCompatActivity
     // String data
     public static String secondTabNormalCloseMessage = "Welcome to Rhythm Plus!";
     public static String seccondTabLoadToastMessage = "Please wait while the sign in page loads";
+    public static String errorLoadingDialogTitle = "Error loading";
+    public static String errorLoadingDialogText = "There was an error while loading the page. We are sorry for the issue.\n\nRestart the client to retry";
+    public static String errorLoadingSnackbar = "Failed to load  -  ";
 
 
 
     WebView webView;
+    boolean errorLoading = false;
 
     WebView loginView;
     WebViewClient webViewClient;
@@ -167,6 +173,19 @@ public class MainActivity extends AppCompatActivity
         loginView.getSettings().setUserAgentString(userAgent);
 
         webViewClient = new WebViewClient(){
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request,
+                                        WebResourceError error) {
+                Snackbar snackbar = Snackbar.make(coordinatorLayout,
+                        errorLoadingSnackbar + error.getDescription(), Snackbar.LENGTH_INDEFINITE);
+                snackbar.show();
+
+                errorLoading = true;
+
+                showDialogBox(MainActivity.this, errorLoadingDialogTitle, errorLoadingDialogText, "Ok", "", null, null);
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if((url.startsWith(mainUrl) && !url.contains(urlForNewTab)) || url.contains(urlToLoad)){
@@ -208,10 +227,32 @@ public class MainActivity extends AppCompatActivity
                 backImg.setVisibility(View.INVISIBLE);
 
                 webView.setVisibility(View.VISIBLE);
+
+                if (errorLoading)
+                {
+                    imageView = findViewById(R.id.splashImg);
+                    imageView.setVisibility(View.VISIBLE);
+
+                    backImg = findViewById(R.id.backImg);
+                    backImg.setVisibility(View.VISIBLE);
+
+                    webView.setVisibility(View.GONE);
+                }
             }
         };
 
         loginClient = new WebViewClient(){
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request,
+                                        WebResourceError error) {
+                Snackbar snackbar = Snackbar.make(coordinatorLayout,
+                        errorLoadingSnackbar + error.getDescription(), Snackbar.LENGTH_INDEFINITE);
+                snackbar.show();
+
+                errorLoading = true;
+
+                showDialogBox(MainActivity.this, errorLoadingDialogTitle, errorLoadingDialogText, "Ok", "", null, null);
+            }
             @Override
             public void onPageFinished(WebView view, String url) {
 
@@ -225,6 +266,20 @@ public class MainActivity extends AppCompatActivity
                     snackbar.show();
 
                     loginView.loadUrl("about:blank");
+                }
+
+                if (errorLoading)
+                {
+                    ImageView imageView = findViewById(R.id.splashImg);
+                    ImageView backImg = findViewById(R.id.backImg);
+
+                    imageView = findViewById(R.id.splashImg);
+                    imageView.setVisibility(View.VISIBLE);
+
+                    backImg = findViewById(R.id.backImg);
+                    backImg.setVisibility(View.VISIBLE);
+
+                    webView.setVisibility(View.GONE);
                 }
             }
         };
