@@ -44,12 +44,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static Boolean offlineMode = false; // Best off! (Unless this is a fork but just adjust the system then)
     public static String myVerCode = "1001";
-    public static String urlToLoad = "veemo.uk/r-plus";
+    public static String urlToLoad = "https://veemo.uk/r-plus"; // Full URL to load
+    public static String mainUrl = "https://rhythm-plus.com"; // Must start with URL to allow loading
+    public static String urlForNewTab = "auth.rhythm-plus.com"; // Must contain to open the second tab
+    public static String urlForNewTabClosure = "auth.rhythm-plus.com/__/auth/handler?state="; // Must contain to close the second tab and return
 
     WebView webView;
 
@@ -116,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
         webView.getSettings().setAllowFileAccess(true);
-        //webView.getSettings().setSupportMultipleWindows(false);
         webView.setScrollbarFadingEnabled(false);
         webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.setInitialScale(1);
@@ -146,11 +149,11 @@ public class MainActivity extends AppCompatActivity {
         webViewClient = new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if((url.contains("rhythm-plus.com") && !url.contains("auth.rhythm-plus.com")) || url.contains(urlToLoad)){
+                if((url.startsWith(mainUrl) && !url.contains(urlForNewTab)) || url.contains(urlToLoad)){
                     // load my page
                     return false;
                 }
-                else if (url.contains("auth.rhythm-plus.com")){
+                else if (url.contains(urlForNewTab)){
                     hasShownAuth = false;
 
                     webView.setVisibility(View.GONE);
@@ -165,13 +168,12 @@ public class MainActivity extends AppCompatActivity {
 
                     return true;
                 }
+                return false;
 
-                // Create an Intent to open the link in the default browser
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                // Set the flag to open the link in a new window or tab
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                view.getContext().startActivity(intent);
-                return true;
+                //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //view.getContext().startActivity(intent);
+                //return true;
             }
 
             @Override
@@ -190,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
 
-                if(url.contains("auth.rhythm-plus.com/__/auth/handler?state=")){
+                if (url.contains(urlForNewTabClosure)){
                         webView.setVisibility(View.VISIBLE);
                         loginView.setVisibility(View.GONE);
 
@@ -203,70 +205,69 @@ public class MainActivity extends AppCompatActivity {
         };
 
         webView.setWebViewClient(webViewClient);
-        webView.loadUrl("https://" + urlToLoad); //https://www.veemo.uk/r-plus
+        webView.loadUrl(urlToLoad);
 
-        String url = "https://www.veemo.uk/net/r-plus/mobile/ver";
-        StringRequest ExampleStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                if (fileExists(MainActivity.this, "checkCode.dat")){
-                    if (!readFile(MainActivity.this, "checkCode.dat").strip().equals(response)){
+        if (!offlineMode) {
+            String url = "https://www.veemo.uk/net/r-plus/mobile/ver";
+            StringRequest ExampleStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if (fileExists(MainActivity.this, "checkCode.dat")) {
+                        if (!readFile(MainActivity.this, "checkCode.dat").strip().equals(response)) {
+                            saveToFile(MainActivity.this, "checkCode.dat", response);
+                            newUpdate(MainActivity.this, response.strip());
+                        }
+                    } else {
                         saveToFile(MainActivity.this, "checkCode.dat", response);
                         newUpdate(MainActivity.this, response.strip());
                     }
                 }
-                else{
-                    saveToFile(MainActivity.this, "checkCode.dat", response);
-                    newUpdate(MainActivity.this, response.strip());
+            }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(MainActivity.this, "Error checking for updates!", Toast.LENGTH_SHORT).show();
                 }
-            }
-        }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, "Error checking for updates!", Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
 
-        ExampleRequestQueue.add(ExampleStringRequest);
+            ExampleRequestQueue.add(ExampleStringRequest);
 
-        String urlNotices = "https://www.veemo.uk/net/r-plus/mobile/notices";
-        StringRequest NoticesStringRequest = new StringRequest(Request.Method.GET, urlNotices, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    String regex = "[;]";
-                    String[] splitNotices;
+            String urlNotices = "https://www.veemo.uk/net/r-plus/mobile/notices";
+            StringRequest NoticesStringRequest = new StringRequest(Request.Method.GET, urlNotices, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        String regex = "[;]";
+                        String[] splitNotices;
 
-                    splitNotices = response.split(regex);
+                        splitNotices = response.split(regex);
 
-                    String seenNotices = readFile(MainActivity.this, "seenNotices.dat").strip();
+                        String seenNotices = readFile(MainActivity.this, "seenNotices.dat").strip();
 
-                    if (!seenNotices.contains(splitNotices[3]) && !splitNotices[0].equals("NONE")) {
-                        Toast.makeText(MainActivity.this, "New Notice! It's been sent in a notification (if enabled)", Toast.LENGTH_SHORT).show();
-                        saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
-                        if (!Objects.equals(splitNotices[2], "NONE")) {
-                            sendNotificationWithURL(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT, splitNotices[2], "More Info");
-                        } else {
-                            sendNotifcation(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT);
+                        if (!seenNotices.contains(splitNotices[3]) && !splitNotices[0].equals("NONE")) {
+                            Toast.makeText(MainActivity.this, "New Notice! It's been sent in a notification (if enabled)", Toast.LENGTH_SHORT).show();
+                            saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
+                            if (!Objects.equals(splitNotices[2], "NONE")) {
+                                sendNotificationWithURL(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT, splitNotices[2], "More Info");
+                            } else {
+                                sendNotifcation(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT);
+                            }
                         }
+                    } catch (Exception e) {
+                        Toast.makeText(MainActivity.this, "Error decoding notices!", Toast.LENGTH_SHORT).show();
                     }
                 }
-                catch (Exception e){
-                    Toast.makeText(MainActivity.this, "Error decoding notices!", Toast.LENGTH_SHORT).show();
+            }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(MainActivity.this, "Error getting notices!", Toast.LENGTH_SHORT).show();
                 }
-            }
-        }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, "Error getting notices!", Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
 
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
-            ExampleRequestQueue.add(NoticesStringRequest);
-        }
-        else{
-            Toast.makeText(this, "To see notices and updates, please enable notifications", Toast.LENGTH_LONG).show();
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                ExampleRequestQueue.add(NoticesStringRequest);
+            } else {
+                Toast.makeText(this, "To see notices and updates, please enable notifications", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
