@@ -224,10 +224,6 @@ public class MainActivity extends AppCompatActivity
         webView.setWebViewClient(webViewClient);
         webView.loadUrl(urlToLoad);
 
-        //CoordinatorLayout coordinatorLayout = findViewById(R.id.main);
-        //Snackbar snackbar = Snackbar.make(coordinatorLayout,
-        //        "Failed to check for updates", Snackbar.LENGTH_LONG);
-        //snackbar.show();
 
         if (!offlineMode) {
             String url = updateUrl;
@@ -247,7 +243,11 @@ public class MainActivity extends AppCompatActivity
             }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(MainActivity.this, "Error checking for updates", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "Error checking for updates", Toast.LENGTH_SHORT).show();
+                    CoordinatorLayout coordinatorLayout = findViewById(R.id.main);
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout,
+                            "Failed to check for updates", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
             });
 
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity
                         String seenNotices = readFile(MainActivity.this, "seenNotices.dat").strip();
 
                         if (!seenNotices.contains(splitNotices[3]) && !splitNotices[0].equals("NONE")) {
-                            Toast.makeText(MainActivity.this, "There's a new notice. Check the notification we sent you if enabled.", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this, "There's a new notice. Check the notification we sent you if enabled.", Toast.LENGTH_SHORT).show();
                             //saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
                             showNewNotice(MainActivity.this, splitNotices[0], splitNotices[1], splitNotices[2]);
 
@@ -277,13 +277,21 @@ public class MainActivity extends AppCompatActivity
                             //}
                         }
                     } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "Error decoding notices", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, "Error decoding notices", Toast.LENGTH_SHORT).show();
+                        CoordinatorLayout coordinatorLayout = findViewById(R.id.main);
+                        Snackbar snackbar = Snackbar.make(coordinatorLayout,
+                                "Failed to decode notices", Snackbar.LENGTH_LONG);
+                        snackbar.show();
                     }
                 }
             }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(MainActivity.this, "Error getting notices", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "Error getting notices", Toast.LENGTH_SHORT).show();
+                    CoordinatorLayout coordinatorLayout = findViewById(R.id.main);
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout,
+                            "Failed to get current notices", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }
             });
 
