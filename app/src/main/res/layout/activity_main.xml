@@ -44,12 +44,15 @@
 
     <ImageView
         android:id="@+id/splashImg"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:rotation="0"
         android:scaleType="centerInside"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
         android:visibility="visible"
+        app:layout_anchor="@+id/loginWeb"
+        app:layout_anchorGravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
