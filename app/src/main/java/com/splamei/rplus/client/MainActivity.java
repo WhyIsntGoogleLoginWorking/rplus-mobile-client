@@ -46,14 +46,26 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends AppCompatActivity
+{
+    // Main data
     public static Boolean offlineMode = false; // Best off! (Unless this is a fork but just adjust the system then)
     public static String myVerCode = "1001";
+
+    // Url and Webview data
     public static String urlToLoad = "https://veemo.uk/r-plus"; // Full URL to load
     public static String mainUrl = "https://rhythm-plus.com"; // Must start with URL to allow loading
     public static String urlForNewTab = "auth.rhythm-plus.com"; // Must contain to open the second tab
     public static String urlForNewTabClosure = "auth.rhythm-plus.com/__/auth/handler?state="; // Must contain to close the second tab and return
+    public static String userAgent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.102 Mobile Safari/537.36";
+    public static String updateUrl = "https://www.veemo.uk/net/r-plus/mobile/ver";
+    public static String noticesUrl = "https://www.veemo.uk/net/r-plus/mobile/notices";
+
+    // String data
+    public static String secondTabNormalCloseMessage = "Welcome to Rhythm Plus!";
+    public static String seccondTabLoadToastMessage = "Please wait while the sign in page loads";
+
+
 
     WebView webView;
 
@@ -92,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 .setIcon(IconCompat.createWithResource(this, R.drawable.icon))
                 .setRank(0)
                 .setIntent(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://www.veemo.uk/r-plus-splamei-client/")))
+                        Uri.parse("https://github.com/splamei/rplus-mobile-client")))
                 .build();
 
         ShortcutManagerCompat.pushDynamicShortcut(this, shortcut);
@@ -123,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         webView.setScrollbarFadingEnabled(false);
         webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.setInitialScale(1);
-        webView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) RPlusSplameiClient/130.0.6723.102 Mobile Safari/537.36");
+        webView.getSettings().setUserAgentString(userAgent);
 
 
         loginView = findViewById(R.id.loginWeb);
@@ -144,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         loginView.setScrollbarFadingEnabled(false);
         loginView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         loginView.setInitialScale(1);
-        loginView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.102 Mobile Safari/537.36");
+        loginView.getSettings().setUserAgentString(userAgent);
 
         webViewClient = new WebViewClient(){
             @Override
@@ -164,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
                     loginView.clearHistory();
 
-                    Toast.makeText(MainActivity.this, "Please wait while the sign in page loads", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, seccondTabLoadToastMessage, Toast.LENGTH_SHORT).show();
 
                     return true;
                 }
@@ -196,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                         webView.setVisibility(View.VISIBLE);
                         loginView.setVisibility(View.GONE);
 
-                            Toast.makeText(MainActivity.this, "Welcome to Rhythm Plus!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, secondTabNormalCloseMessage, Toast.LENGTH_SHORT).show();
 
 
                         loginView.loadUrl("about:blank");
@@ -208,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl(urlToLoad);
 
         if (!offlineMode) {
-            String url = "https://www.veemo.uk/net/r-plus/mobile/ver";
+            String url = updateUrl;
             StringRequest ExampleStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -231,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
 
             ExampleRequestQueue.add(ExampleStringRequest);
 
-            String urlNotices = "https://www.veemo.uk/net/r-plus/mobile/notices";
+            String urlNotices = noticesUrl;
             StringRequest NoticesStringRequest = new StringRequest(Request.Method.GET, urlNotices, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
