@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity
 
                         if (!seenNotices.contains(splitNotices[3]) && !splitNotices[0].equals("NONE")) {
                             //Toast.makeText(MainActivity.this, "There's a new notice. Check the notification we sent you if enabled.", Toast.LENGTH_SHORT).show();
-                            //saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
+                            saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
                             showNewNotice(MainActivity.this, splitNotices[0], splitNotices[1], splitNotices[2]);
 
                             //if (!Objects.equals(splitNotices[2], "NONE")) {
