@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                     // load my page
                     return false;
                 }
-                else if (url.startsWith(urlForNewTab)) {
+                else if (url.contains(urlForNewTab)) {
                     hasShownAuth = false;
 
                     webView.setVisibility(View.GONE);
