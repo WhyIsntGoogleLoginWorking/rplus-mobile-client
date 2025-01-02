@@ -93,10 +93,10 @@ public class MainActivity extends AppCompatActivity
             return insets;
         });
 
-        createChannel(this, UPDATE_CHANNEL_ID, "Update", "Notifications for updates to the client", NotificationManager.IMPORTANCE_HIGH);
-        createChannel(this, NOTICES_CHANNEL_ID, "Notices", "Notices for the client", NotificationManager.IMPORTANCE_HIGH);
-        createChannel(this, CHANNEL_ID, "Dev Testing Channel", "The notification channel for testing dev stuff", NotificationManager.IMPORTANCE_DEFAULT);
-        createChannel(this, MISC_CHANNEL_ID, "Misc", "General Notifications for the client", NotificationManager.IMPORTANCE_DEFAULT);
+        createChannel(this, UPDATE_CHANNEL_ID, "Update Directs", "Notifications that alert you upon a new update", NotificationManager.IMPORTANCE_HIGH);
+        createChannel(this, NOTICES_CHANNEL_ID, "Notice Information", "Notices for the client", NotificationManager.IMPORTANCE_HIGH);
+        createChannel(this, CHANNEL_ID, "Testing Channel", "The notification channel for testing during development. Unused in release builds", NotificationManager.IMPORTANCE_DEFAULT);
+        createChannel(this, MISC_CHANNEL_ID, "Misc", "Other notifcations used by the client", NotificationManager.IMPORTANCE_DEFAULT);
 
         ShortcutInfoCompat shortcut = new ShortcutInfoCompat.Builder(this, "more")
                 .setShortLabel("About")
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity
             }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(MainActivity.this, "Error checking for updates!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Error checking for updates", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity
                         String seenNotices = readFile(MainActivity.this, "seenNotices.dat").strip();
 
                         if (!seenNotices.contains(splitNotices[3]) && !splitNotices[0].equals("NONE")) {
-                            Toast.makeText(MainActivity.this, "New Notice! It's been sent in a notification (if enabled)", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "There's a new notice. Check the notification we sent you if enabled.", Toast.LENGTH_SHORT).show();
                             saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
                             if (!Objects.equals(splitNotices[2], "NONE")) {
                                 sendNotificationWithURL(MainActivity.this, NOTICES_CHANNEL_ID, splitNotices[0], splitNotices[1], NotificationCompat.PRIORITY_DEFAULT, splitNotices[2], "More Info");
@@ -265,13 +265,13 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "Error decoding notices!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Error decoding notices", Toast.LENGTH_SHORT).show();
                     }
                 }
             }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(MainActivity.this, "Error getting notices!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Error getting notices", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -398,7 +398,7 @@ public class MainActivity extends AppCompatActivity
     public static void newUpdate(Context context, String responce){
         if (!myVerCode.contains(responce)) {
             sendNotificationWithURL(context, UPDATE_CHANNEL_ID, "New Update", "The is a new update to the client. Tap or press the button to update. You won't be alerted about this update again.", NotificationCompat.PRIORITY_DEFAULT, "https://www.veemo.uk/r-plus-download", "Update");
-            Toast.makeText(context, "Theres a new update!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Theres a new update to the client", Toast.LENGTH_LONG).show();
             Toast.makeText(context, "Check the GitHub Repo to update the client", Toast.LENGTH_LONG).show();
         }
     }
