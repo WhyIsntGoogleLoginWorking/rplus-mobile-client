@@ -184,7 +184,10 @@ public class MainActivity extends AppCompatActivity
 
                     loginView.clearHistory();
 
-                    Toast.makeText(MainActivity.this, seccondTabLoadToastMessage, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, seccondTabLoadToastMessage, Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout,
+                            seccondTabLoadToastMessage, Snackbar.LENGTH_LONG);
+                    snackbar.show();
 
                     return true;
                 }
@@ -212,14 +215,16 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onPageFinished(WebView view, String url) {
 
-                if (url.contains(urlForNewTabClosure)){
-                        webView.setVisibility(View.VISIBLE);
-                        loginView.setVisibility(View.GONE);
+                if (url.contains(urlForNewTabClosure)) {
+                    webView.setVisibility(View.VISIBLE);
+                    loginView.setVisibility(View.GONE);
 
-                            Toast.makeText(MainActivity.this, secondTabNormalCloseMessage, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, secondTabNormalCloseMessage, Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar.make(coordinatorLayout,
+                            secondTabNormalCloseMessage, Snackbar.LENGTH_LONG);
+                    snackbar.show();
 
-
-                        loginView.loadUrl("about:blank");
+                    loginView.loadUrl("about:blank");
                 }
             }
         };
