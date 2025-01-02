@@ -58,7 +58,7 @@ import java.util.*;
 public class MainActivity extends AppCompatActivity
 {
     // Main data
-    public static Boolean offlineMode = true; // Best off! (Unless this is a fork but just adjust the system then)
+    public static Boolean offlineMode = false; // Best off! (Unless this is a fork but just adjust the system then)
     public static String myVerCode = "1001";
 
     // Url and Webview data
