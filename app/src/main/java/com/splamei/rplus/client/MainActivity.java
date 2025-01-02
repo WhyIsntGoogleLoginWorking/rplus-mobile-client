@@ -58,7 +58,7 @@ import java.util.*;
 public class MainActivity extends AppCompatActivity
 {
     // Main data
-    public static Boolean offlineMode = false; // Best off! (Unless this is a fork but just adjust the system then)
+    public static Boolean offlineMode = true; // Best off! (Unless this is a fork but just adjust the system then)
     public static String myVerCode = "1001";
 
     // Url and Webview data
@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity
     WebView loginView;
     WebViewClient webViewClient;
     WebViewClient loginClient;
+
+    CoordinatorLayout coordinatorLayout;
 
     boolean hasShownAuth = false;
 
@@ -115,6 +117,7 @@ public class MainActivity extends AppCompatActivity
         ShortcutManagerCompat.pushDynamicShortcut(this, shortcut);
 
         ExampleRequestQueue = Volley.newRequestQueue(MainActivity.this);
+        coordinatorLayout = findViewById(R.id.main);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1008);
@@ -244,7 +247,6 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     //Toast.makeText(MainActivity.this, "Error checking for updates", Toast.LENGTH_SHORT).show();
-                    CoordinatorLayout coordinatorLayout = findViewById(R.id.main);
                     Snackbar snackbar = Snackbar.make(coordinatorLayout,
                             "Failed to check for updates", Snackbar.LENGTH_LONG);
                     snackbar.show();
@@ -278,7 +280,6 @@ public class MainActivity extends AppCompatActivity
                         }
                     } catch (Exception e) {
                         //Toast.makeText(MainActivity.this, "Error decoding notices", Toast.LENGTH_SHORT).show();
-                        CoordinatorLayout coordinatorLayout = findViewById(R.id.main);
                         Snackbar snackbar = Snackbar.make(coordinatorLayout,
                                 "Failed to decode notices", Snackbar.LENGTH_LONG);
                         snackbar.show();
@@ -288,18 +289,17 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     //Toast.makeText(MainActivity.this, "Error getting notices", Toast.LENGTH_SHORT).show();
-                    CoordinatorLayout coordinatorLayout = findViewById(R.id.main);
                     Snackbar snackbar = Snackbar.make(coordinatorLayout,
                             "Failed to get current notices", Snackbar.LENGTH_LONG);
                     snackbar.show();
                 }
             });
 
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                ExampleRequestQueue.add(NoticesStringRequest);
-            } else {
-                Toast.makeText(this, "To see notices and updates, please enable notifications", Toast.LENGTH_LONG).show();
-            }
+            //if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            //    ExampleRequestQueue.add(NoticesStringRequest);
+            //} else {
+            //    Toast.makeText(this, "To see notices and updates, please enable notifications", Toast.LENGTH_LONG).show();
+            //}
         }
     }
 
