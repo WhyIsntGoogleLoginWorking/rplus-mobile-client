@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity
     public static String myVerCode = "1001";
 
     // Url and Webview data
-    public static String urlToLoad = "https://veemo.uk/r-plus"; // Full URL to load
+    public static String urlToLoad = "https://www.veemo.uk/r-plus"; // Full URL to load
     public static String mainUrl = "https://rhythm-plus.com"; // Must start with URL to allow loading
     public static String urlForNewTab = "auth.rhythm-plus.com"; // Must contain to open the second tab
     public static String urlForNewTabClosure = "auth.rhythm-plus.com/__/auth/handler?state="; // Must contain to close the second tab and return
@@ -171,11 +171,11 @@ public class MainActivity extends AppCompatActivity
         webViewClient = new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if((url.startsWith(mainUrl) && !url.contains(urlForNewTab)) || url.contains(urlToLoad)){
+                if((url.startsWith(mainUrl) && !url.contains(urlForNewTab)) || url.startsWith(urlToLoad)){
                     // load my page
                     return false;
                 }
-                else if (url.contains(urlForNewTab)) {
+                else if (url.startsWith(urlForNewTab)) {
                     hasShownAuth = false;
 
                     webView.setVisibility(View.GONE);
