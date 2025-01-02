@@ -119,9 +119,9 @@ public class MainActivity extends AppCompatActivity
         ExampleRequestQueue = Volley.newRequestQueue(MainActivity.this);
         coordinatorLayout = findViewById(R.id.main);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1008);
-        }
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+        //    requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1008);
+        //}
 
         int UI_OPTIONS = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
         getWindow().getDecorView().setSystemUiVisibility(UI_OPTIONS);
@@ -266,7 +266,6 @@ public class MainActivity extends AppCompatActivity
                         splitNotices = response.split(regex);
 
                         String seenNotices = readFile(MainActivity.this, "seenNotices.dat").strip();
-
                         if (!seenNotices.contains(splitNotices[3]) && !splitNotices[0].equals("NONE")) {
                             //Toast.makeText(MainActivity.this, "There's a new notice. Check the notification we sent you if enabled.", Toast.LENGTH_SHORT).show();
                             saveToFile(MainActivity.this, "seenNotices.dat", splitNotices[3]);
@@ -296,7 +295,7 @@ public class MainActivity extends AppCompatActivity
             });
 
             //if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            //    ExampleRequestQueue.add(NoticesStringRequest);
+            ExampleRequestQueue.add(NoticesStringRequest);
             //} else {
             //    Toast.makeText(this, "To see notices and updates, please enable notifications", Toast.LENGTH_LONG).show();
             //}
@@ -458,7 +457,7 @@ public class MainActivity extends AppCompatActivity
     {
         if (url.contains("NONE"))
         {
-            showDialogBox(context, title, text, "Ok", url, null, null);
+            showDialogBox(context, title, text, "Ok", "", null, null);
         }
         else
         {
