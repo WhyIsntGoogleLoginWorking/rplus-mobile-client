@@ -51,7 +51,7 @@ Currently, no. I do have plan to have it on the play store but that won't happen
 ### Q) I have an older Android device then 8.0 Oreo. Can I still use the client?
 No. Because the client uses functions that only work on SDK Version 28+, any older Android device won't be able to run it. Even if you tried. You may want to try the [legacy version](https://github.com/splamei/rhythm-plus-splamei-mobile-client) of the client but that won't be updated anymore.
 ### Q) Will the client come to other platforms? (Windows, MacOS, iOS, Linux)
-The client likely will also come to Windows and possible MacOS and Linux but not iOS since it would need to be sideloaded, which can only be done in the EU right now, and to get it on the App Store would require me to play ~$50 a year to Apple (which I don't want to do)
+The client is avalible for Windows and can be also found on [GitHub](https://github.com/splamei/rplus-pc-client) and might come to MacOS and Linux but not iOS since it would need to be sideloaded, which can only be done in the EU right now, and to get it on the App Store would require me to play ~$50 a year to Apple (which I don't want to do)
 ### Q) I want to make my own client. Can I do that?
 Yes! Just make sure you follow everything stated in the 'Making your own Client' section
 ### Q) Is this client official?
