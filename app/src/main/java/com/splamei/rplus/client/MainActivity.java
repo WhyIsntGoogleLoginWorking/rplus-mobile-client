@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
 
     // String data
     public static String secondTabNormalCloseMessage = "Welcome to Rhythm Plus!";
-    public static String seccondTabLoadToastMessage = "Please wait while the sign in page loads";
+    public static String seccondTabLoadToastMessage = "Please wait. The sign-in page is loading";
 
 
 
@@ -104,8 +104,7 @@ public class MainActivity extends AppCompatActivity
             return insets;
         });
 
-        createChannel(this, CHANNEL_ID, "Testing Channel", "The notification channel for testing during development. Unused in release builds", NotificationManager.IMPORTANCE_DEFAULT);
-        createChannel(this, MISC_CHANNEL_ID, "Misc", "Other notifcations used by the client", NotificationManager.IMPORTANCE_DEFAULT);
+        createChannel(this, MISC_CHANNEL_ID, "Misc", "Notifications used by the client", NotificationManager.IMPORTANCE_DEFAULT);
 
         ShortcutInfoCompat shortcut = new ShortcutInfoCompat.Builder(this, "more")
                 .setShortLabel("About")
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity
                 .setIcon(IconCompat.createWithResource(this, R.drawable.icon))
                 .setRank(0)
                 .setIntent(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/splamei/rplus-mobile-client")))
+                        Uri.parse("https://www.veemo.uk/r-plus-splamei-client/")))
                 .build();
 
         ShortcutManagerCompat.pushDynamicShortcut(this, shortcut);
@@ -447,7 +446,7 @@ public class MainActivity extends AppCompatActivity
             //Toast.makeText(context, "Theres a new update to the client", Toast.LENGTH_LONG).show();
             //Toast.makeText(context, "Check the GitHub Repo to update the client", Toast.LENGTH_LONG).show();
 
-            showDialogBox(context, "New update", "There is a new update to the client app. It's recommended you update for the latest fixes and changes however you can optionally skip though it's not recommended.\n\nWe won't tell you about this until the next update", "Update", "Later", new DialogInterface.OnClickListener() {
+            showDialogBox(context, "New update", "There is a new update to the client app. It's recommended you update for the latest fixes and changes however you can optionally skip\n\nYou won't be alerted about this update again until there is a new update", "Update", "Later", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Toast.makeText(context, "GitHub should now open via the app or website", Toast.LENGTH_SHORT).show();
