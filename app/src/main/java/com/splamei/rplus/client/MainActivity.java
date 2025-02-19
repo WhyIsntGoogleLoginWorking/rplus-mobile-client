@@ -68,7 +68,8 @@ public class MainActivity extends AppCompatActivity
     public static String mainUrl = "https://rhythm-plus.com"; // Must start with URL to allow loading
     public static String urlForNewTab = "auth.rhythm-plus.com"; // Must contain to open the second tab
     public static String urlForNewTabClosure = "auth.rhythm-plus.com/__/auth/handler?state="; // Must contain to close the second tab and return
-    public static String userAgent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.102 Mobile Safari/537.36";
+    public static String webView1UserAgent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) RhythmPlusSplameiClient/1003 Mobile Safari/537.36";
+    public static String webView2UserAgent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.6943.89 Mobile Safari/537.36";
     public static String updateUrl = "https://www.veemo.uk/net/r-plus/mobile/ver";
     public static String noticesUrl = "https://www.veemo.uk/net/r-plus/mobile/notices";
 
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity
         webView.setScrollbarFadingEnabled(false);
         webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.setInitialScale(1);
-        webView.getSettings().setUserAgentString(userAgent);
+        webView.getSettings().setUserAgentString(webView1UserAgent);
 
 
         loginView = findViewById(R.id.loginWeb);
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         loginView.setScrollbarFadingEnabled(false);
         loginView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         loginView.setInitialScale(1);
-        loginView.getSettings().setUserAgentString(userAgent);
+        loginView.getSettings().setUserAgentString(webView2UserAgent);
 
         webViewClient = new WebViewClient(){
             @Override
