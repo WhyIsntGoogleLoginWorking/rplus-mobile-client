@@ -1,6 +1,7 @@
 package com.splamei.rplus.client;
 
 import android.Manifest;
+import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -39,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.view.KeyEvent;
 import android.content.Intent;
+import android.content.BroadcastReceiver;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity
     boolean hasShownAuth = false;
 
     public static final String CHANNEL_ID = "testing_channel";
+    public static final String ERROR_CHANNEL_ID = "error_channel";
     public static final String MISC_CHANNEL_ID = "misc_channel";
 
     RequestQueue ExampleRequestQueue;
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         createChannel(this, MISC_CHANNEL_ID, "Misc", "Notifications used by the client", NotificationManager.IMPORTANCE_DEFAULT);
+        createChannel(this, ERROR_CHANNEL_ID, "Errors", "Notifications sent when errors occur", NotificationManager.IMPORTANCE_HIGH);
 
         ShortcutInfoCompat shortcut = new ShortcutInfoCompat.Builder(this, "more")
                 .setShortLabel("About")
@@ -124,9 +128,9 @@ public class MainActivity extends AppCompatActivity
         ExampleRequestQueue = Volley.newRequestQueue(MainActivity.this);
         coordinatorLayout = findViewById(R.id.main);
 
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-        //    requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1008);
-        //}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1008);
+        }
 
         int UI_OPTIONS = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
         getWindow().getDecorView().setSystemUiVisibility(UI_OPTIONS);
@@ -356,7 +360,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public static void sendNotifcation(Context context, final String ID, String title, String message, int importance){
+    public static void sendNotifcation(Context context, final String ID, String title, String message, int importance, int id){
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, ID)
                 .setContentTitle(title)
                 .setContentText(message)
@@ -366,11 +371,11 @@ public class MainActivity extends AppCompatActivity
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         if (notificationManagerCompat.areNotificationsEnabled()){
-            notificationManagerCompat.notify(1455, builder.build());
+            notificationManagerCompat.notify(id, builder.build());
         }
     }
 
-    public static void sendNotificationWithURL(Context context, final String ID, String title, String message, int importance, String url, String buttonText) {
+    public static boolean sendNotificationWithURL(Context context, final String ID, String title, String message, int importance, String url, String buttonText, int notifcationID) {
         // Create an Intent to open the URL
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
@@ -382,16 +387,21 @@ public class MainActivity extends AppCompatActivity
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setPriority(importance)
-                .setContentIntent(pendingIntent) // Set the pending intent for the notification
-                .addAction(R.drawable.ic_stat_name, buttonText, pendingIntent); // Add the "Update" action
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent); // Set the pending intent for the notification
+                //.addAction(R.drawable.ic_stat_name, buttonText, pendingIntent); // Add the "Update" action
 
         // Create a NotificationManagerCompat
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
 
         // Check if notifications are enabled
         if (notificationManagerCompat.areNotificationsEnabled()) {
-            notificationManagerCompat.notify(1455, builder.build());
+            notificationManagerCompat.notify(notifcationID, builder.build());
+
+            return true;
         }
+
+        return false;
     }
 
     public static void showDialogBox(Context context, String title, String text, String button1Text, String button2text, DialogInterface.OnClickListener button1Pressed, DialogInterface.OnClickListener button2Pressed)
