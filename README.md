@@ -29,7 +29,7 @@ If your using this code to make your own custom client whether that be for Rhyth
  - Replace or remove the update handling (and notice feature if you want)
  - Change the package name
  - If the client isn't for Rhythm Plus, please change the icons the client uses
- - Because this client is currently under the MIT Licence, you **must** acknowledge my copyright ( (c) 2024 Splamei ) and have your client under the MIT Licence too
+ - Because this client is currently under the MIT Licence, you **must** acknowledge the copyright of the client and the MIT Licence. You do not have to place your client under the MIT Licence
 ## Contributing
 I would love for people to help the clients development so any little contribution would go a long way!
 You could contribute by:
