@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity
     public static String noticesUrl = "https://www.veemo.uk/net/r-plus/mobile/notices";
 
     // String data
-    public static String secondTabNormalCloseMessage = "Welcome to Rhythm Plus!";
-    public static String seccondTabLoadToastMessage = "Please wait. The sign-in page is loading";
+    public static String secondTabNormalCloseMessage = "Welcome to Rhythm Plus";
+    public static String seccondTabLoadToastMessage = "Please wait while the sign-in page loads";
 
 
 
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        createChannel(this, MISC_CHANNEL_ID, "Misc", "Notifications used by the client", NotificationManager.IMPORTANCE_DEFAULT);
+        createChannel(this, MISC_CHANNEL_ID, "Misc", "Other notifications used by the client", NotificationManager.IMPORTANCE_DEFAULT);
         createChannel(this, ERROR_CHANNEL_ID, "Errors", "Notifications sent when errors occur", NotificationManager.IMPORTANCE_HIGH);
 
         ShortcutInfoCompat shortcut = new ShortcutInfoCompat.Builder(this, "more")
@@ -111,7 +111,17 @@ public class MainActivity extends AppCompatActivity
                         Uri.parse("https://www.veemo.uk/r-plus-splamei-client/")))
                 .build();
 
+        ShortcutInfoCompat licenceShortcut = new ShortcutInfoCompat.Builder(this, "licence")
+                .setShortLabel("Licence")
+                .setLongLabel("Licence")
+                .setIcon(IconCompat.createWithResource(this, R.drawable.icon))
+                .setRank(1)
+                .setIntent(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/splamei/rplus-mobile-client/blob/master/LICENSE")))
+                .build();
+
         ShortcutManagerCompat.pushDynamicShortcut(this, shortcut);
+        ShortcutManagerCompat.pushDynamicShortcut(this, licenceShortcut);
 
         ExampleRequestQueue = Volley.newRequestQueue(MainActivity.this);
         coordinatorLayout = findViewById(R.id.main);
