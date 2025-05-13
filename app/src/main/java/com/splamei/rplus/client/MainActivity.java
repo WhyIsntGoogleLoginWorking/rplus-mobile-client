@@ -5,21 +5,18 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.pm.ShortcutInfoCompat;
@@ -30,8 +27,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import android.content.DialogInterface;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.webkit.WebSettings;
 import android.widget.ImageView;
@@ -47,7 +42,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
@@ -55,7 +49,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -74,8 +67,8 @@ public class MainActivity extends AppCompatActivity
     public static String noticesUrl = "https://www.veemo.uk/net/r-plus/mobile/notices";
 
     // String data
-    public static String secondTabNormalCloseMessage = "Welcome to Rhythm Plus!";
-    public static String seccondTabLoadToastMessage = "Please wait. The sign-in page is loading";
+    public static String secondTabNormalCloseMessage = "Welcome to Rhythm Plus";
+    public static String seccondTabLoadToastMessage = "Please wait while the sign-in page loads";
 
 
 
@@ -88,8 +81,7 @@ public class MainActivity extends AppCompatActivity
     CoordinatorLayout coordinatorLayout;
 
     boolean hasShownAuth = false;
-
-    public static final String CHANNEL_ID = "testing_channel";
+    public static final String ERROR_CHANNEL_ID = "error_channel";
     public static final String MISC_CHANNEL_ID = "misc_channel";
 
     RequestQueue ExampleRequestQueue;
@@ -105,7 +97,10 @@ public class MainActivity extends AppCompatActivity
             return insets;
         });
 
-        createChannel(this, MISC_CHANNEL_ID, "Misc", "Notifications used by the client", NotificationManager.IMPORTANCE_DEFAULT);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        createChannel(this, MISC_CHANNEL_ID, "Misc", "Other notifications used by the client", NotificationManager.IMPORTANCE_DEFAULT);
+        createChannel(this, ERROR_CHANNEL_ID, "Errors", "Notifications sent when errors occur", NotificationManager.IMPORTANCE_HIGH);
 
         ShortcutInfoCompat shortcut = new ShortcutInfoCompat.Builder(this, "more")
                 .setShortLabel("About")
@@ -116,14 +111,24 @@ public class MainActivity extends AppCompatActivity
                         Uri.parse("https://www.veemo.uk/r-plus-splamei-client/")))
                 .build();
 
+        ShortcutInfoCompat licenceShortcut = new ShortcutInfoCompat.Builder(this, "licence")
+                .setShortLabel("Licence")
+                .setLongLabel("Licence")
+                .setIcon(IconCompat.createWithResource(this, R.drawable.icon))
+                .setRank(1)
+                .setIntent(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/splamei/rplus-mobile-client/blob/master/LICENSE")))
+                .build();
+
         ShortcutManagerCompat.pushDynamicShortcut(this, shortcut);
+        ShortcutManagerCompat.pushDynamicShortcut(this, licenceShortcut);
 
         ExampleRequestQueue = Volley.newRequestQueue(MainActivity.this);
         coordinatorLayout = findViewById(R.id.main);
 
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-        //    requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1008);
-        //}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1008);
+        }
 
         int UI_OPTIONS = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
         getWindow().getDecorView().setSystemUiVisibility(UI_OPTIONS);
@@ -353,7 +358,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public static void sendNotifcation(Context context, final String ID, String title, String message, int importance){
+    public static void sendNotifcation(Context context, final String ID, String title, String message, int importance, int id){
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, ID)
                 .setContentTitle(title)
                 .setContentText(message)
@@ -363,11 +369,11 @@ public class MainActivity extends AppCompatActivity
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         if (notificationManagerCompat.areNotificationsEnabled()){
-            notificationManagerCompat.notify(1455, builder.build());
+            notificationManagerCompat.notify(id, builder.build());
         }
     }
 
-    public static void sendNotificationWithURL(Context context, final String ID, String title, String message, int importance, String url, String buttonText) {
+    public static boolean sendNotificationWithURL(Context context, final String ID, String title, String message, int importance, String url, String buttonText, int notifcationID) {
         // Create an Intent to open the URL
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
@@ -379,16 +385,21 @@ public class MainActivity extends AppCompatActivity
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setPriority(importance)
-                .setContentIntent(pendingIntent) // Set the pending intent for the notification
-                .addAction(R.drawable.ic_stat_name, buttonText, pendingIntent); // Add the "Update" action
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent); // Set the pending intent for the notification
+                //.addAction(R.drawable.ic_stat_name, buttonText, pendingIntent); // Add the "Update" action
 
         // Create a NotificationManagerCompat
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
 
         // Check if notifications are enabled
         if (notificationManagerCompat.areNotificationsEnabled()) {
-            notificationManagerCompat.notify(1455, builder.build());
+            notificationManagerCompat.notify(notifcationID, builder.build());
+
+            return true;
         }
+
+        return false;
     }
 
     public static void showDialogBox(Context context, String title, String text, String button1Text, String button2text, DialogInterface.OnClickListener button1Pressed, DialogInterface.OnClickListener button2Pressed)
